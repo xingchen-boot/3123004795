@@ -306,6 +306,15 @@
                         </div>
                     </div>
                     
+                    <div class="algorithm-selector">
+                        <label for="algorithmSelectFile" class="form-label">
+                            <i class="fas fa-cogs"></i> 选择算法
+                        </label>
+                        <select class="form-select" id="algorithmSelectFile">
+                            <option value="">使用综合算法（推荐）</option>
+                        </select>
+                    </div>
+                    
                     <div class="text-center mt-4">
                         <button class="btn btn-primary btn-lg" onclick="calculateSimilarityFromFiles()">
                             <i class="fas fa-calculator"></i> 开始检测
@@ -384,33 +393,59 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    const select = document.getElementById('algorithmSelect');
+                    // 填充文本输入面板的算法选择器
+                    const selectText = document.getElementById('algorithmSelect');
                     // 清空现有选项（保留第一个默认选项）
-                    while (select.children.length > 1) {
-                        select.removeChild(select.lastChild);
+                    while (selectText.children.length > 1) {
+                        selectText.removeChild(selectText.lastChild);
+                    }
+                    
+                    // 填充文件上传面板的算法选择器
+                    const selectFile = document.getElementById('algorithmSelectFile');
+                    // 清空现有选项（保留第一个默认选项）
+                    while (selectFile.children.length > 1) {
+                        selectFile.removeChild(selectFile.lastChild);
                     }
                     
                     data.algorithms.forEach(algorithm => {
-                        const option = document.createElement('option');
-                        option.value = algorithm;
-                        option.textContent = algorithm;
-                        select.appendChild(option);
+                        // 为文本输入面板添加选项
+                        const optionText = document.createElement('option');
+                        optionText.value = algorithm;
+                        optionText.textContent = algorithm;
+                        selectText.appendChild(optionText);
+                        
+                        // 为文件上传面板添加选项
+                        const optionFile = document.createElement('option');
+                        optionFile.value = algorithm;
+                        optionFile.textContent = algorithm;
+                        selectFile.appendChild(optionFile);
                     });
                 }
             } catch (error) {
                 console.error('加载算法列表失败:', error);
                 // 如果后端不可用，使用本地算法列表
-                const select = document.getElementById('algorithmSelect');
                 const localAlgorithms = [
                     'Cosine Similarity',
                     'Levenshtein Distance', 
                     'Jaccard Similarity'
                 ];
+                
+                // 填充文本输入面板
+                const selectText = document.getElementById('algorithmSelect');
                 localAlgorithms.forEach(algorithm => {
                     const option = document.createElement('option');
                     option.value = algorithm;
                     option.textContent = algorithm;
-                    select.appendChild(option);
+                    selectText.appendChild(option);
+                });
+                
+                // 填充文件上传面板
+                const selectFile = document.getElementById('algorithmSelectFile');
+                localAlgorithms.forEach(algorithm => {
+                    const option = document.createElement('option');
+                    option.value = algorithm;
+                    option.textContent = algorithm;
+                    selectFile.appendChild(option);
                 });
             }
         }
@@ -507,6 +542,7 @@
         async function calculateSimilarityFromFiles() {
             const originalFile = document.getElementById('originalFile').files[0];
             const plagiarizedFile = document.getElementById('plagiarizedFile').files[0];
+            const algorithm = document.getElementById('algorithmSelectFile').value;
             
             if (!originalFile || !plagiarizedFile) {
                 showError('请选择原文文件和待检测文件');
@@ -521,6 +557,11 @@
                 formData.append('originalFile', originalFile);
                 formData.append('plagiarizedFile', plagiarizedFile);
                 
+                // 如果选择了算法，添加到FormData中
+                if (algorithm) {
+                    formData.append('algorithmName', algorithm);
+                }
+                
                 const response = await fetch(`${url}/api/similarity/upload`, {
                     method: 'POST',
                     body: formData
@@ -529,7 +570,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    showResult(data.similarity, data.similarityPercentage);
+                    showResult(data.similarity, data.similarityPercentage, data.algorithm);
                 } else {
                     showError(data.error || '计算失败');
                 }
@@ -607,6 +648,7 @@
             document.getElementById('plagiarizedFile').value = '';
             document.getElementById('originalFileInfo').innerHTML = '';
             document.getElementById('plagiarizedFileInfo').innerHTML = '';
+            document.getElementById('algorithmSelectFile').value = '';
             document.getElementById('resultCard').style.display = 'none';
         }
         

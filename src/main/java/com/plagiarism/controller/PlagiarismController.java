@@ -95,12 +95,14 @@ public class PlagiarismController {
      * 
      * @param originalFile 原文文件
      * @param plagiarizedFile 抄袭文件
+     * @param algorithmName 算法名称（可选）
      * @return 相似度结果
      */
     @PostMapping("/similarity/upload")
     public ResponseEntity<Map<String, Object>> calculateSimilarityFromFiles(
             @RequestParam("originalFile") MultipartFile originalFile,
-            @RequestParam("plagiarizedFile") MultipartFile plagiarizedFile) {
+            @RequestParam("plagiarizedFile") MultipartFile plagiarizedFile,
+            @RequestParam(value = "algorithmName", required = false) String algorithmName) {
         
         Map<String, Object> response = new HashMap<>();
         
@@ -117,13 +119,22 @@ public class PlagiarismController {
             String plagiarizedText = new String(plagiarizedFile.getBytes(), "UTF-8");
             
             // 计算相似度
-            double similarity = plagiarismDetectionService.calculateSimilarity(originalText, plagiarizedText);
+            double similarity;
+            if (algorithmName != null && !algorithmName.trim().isEmpty()) {
+                similarity = plagiarismDetectionService.calculateSimilarityWithAlgorithm(
+                    originalText, plagiarizedText, algorithmName);
+            } else {
+                similarity = plagiarismDetectionService.calculateSimilarity(originalText, plagiarizedText);
+            }
             
             response.put("success", true);
             response.put("similarity", plagiarismDetectionService.formatSimilarity(similarity));
             response.put("similarityPercentage", plagiarismDetectionService.formatSimilarityAsPercentage(similarity));
             response.put("originalFileName", originalFile.getOriginalFilename());
             response.put("plagiarizedFileName", plagiarizedFile.getOriginalFilename());
+            if (algorithmName != null && !algorithmName.trim().isEmpty()) {
+                response.put("algorithm", algorithmName);
+            }
             response.put("message", "相似度计算成功");
             
             return ResponseEntity.ok(response);
