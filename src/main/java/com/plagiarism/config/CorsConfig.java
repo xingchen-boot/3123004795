@@ -24,7 +24,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*")  // 允许所有来源
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(false)  // 改为false以避免与allowedOriginPatterns("*")冲突
                 .maxAge(3600);
     }
 
@@ -34,7 +34,7 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.addAllowedOriginPattern("*");  // 允许所有来源
         configuration.addAllowedMethod("*");         // 允许所有HTTP方法
         configuration.addAllowedHeader("*");         // 允许所有请求头
-        configuration.setAllowCredentials(true);     // 允许携带凭证
+        configuration.setAllowCredentials(false);    // 改为false以避免与allowedOriginPattern("*")冲突
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
