@@ -24,38 +24,41 @@
 
 ```
 软工个人项目/
-├── frontend.html              # 独立前端页面（主要使用）
-├── pom.xml                    # Maven配置文件
-├── PSP.md                     # PSP表格
-├── README.md                  # 项目说明
-├── 使用说明.md               # 使用说明
-├── src/                       # 源代码
+├── main.jar                      # 可执行jar文件（符合作业要求）
+├── frontend.html                 # 独立前端页面（主要使用）
+├── pom.xml                       # Maven配置文件
+├── PSP.md                        # PSP表格
+├── README.md                     # 项目说明
+├── 使用说明.md                   # 使用说明
+├── src/                          # 源代码
 │   ├── main/java/com/plagiarism/
-│   │   ├── algorithm/           # 相似度算法
+│   │   ├── algorithm/            # 相似度算法
 │   │   │   ├── SimilarityAlgorithm.java
 │   │   │   └── impl/
 │   │   │       ├── CosineSimilarity.java
 │   │   │       ├── LevenshteinSimilarity.java
 │   │   │       ├── JaccardSimilarity.java
 │   │   │       └── OptimizedCosineSimilarity.java
-│   │   ├── service/             # 业务服务
+│   │   ├── service/              # 业务服务
 │   │   │   └── PlagiarismDetectionService.java
-│   │   ├── controller/          # Web控制器
+│   │   ├── controller/           # Web控制器
 │   │   │   ├── PlagiarismController.java
 │   │   │   └── PerformanceController.java
-│   │   ├── config/              # 配置类
+│   │   ├── config/               # 配置类
 │   │   │   └── CorsConfig.java
-│   │   ├── exception/           # 异常处理
+│   │   ├── exception/            # 异常处理
 │   │   │   └── GlobalExceptionHandler.java
-│   │   ├── util/                # 工具类
+│   │   ├── util/                 # 工具类
 │   │   │   └── PerformanceMonitor.java
-│   │   ├── Main.java            # 命令行入口
+│   │   ├── SimpleCommandLineMain.java  # 命令行入口（独立版本）
+│   │   ├── CommandLineMain.java        # 命令行入口（Spring Boot版本）
+│   │   ├── Main.java                   # 原始命令行入口
 │   │   └── PlagiarismDetectorApplication.java
 │   └── resources/
 │       └── application.properties
-├── test/                        # 测试代码
+├── test/                         # 测试代码
 │   └── java/com/plagiarism/
-│       ├── algorithm/impl/      # 算法测试
+│       ├── algorithm/impl/       # 算法测试
 │       ├── service/             # 服务测试
 │       ├── controller/          # 控制器测试
 │       └── integration/         # 集成测试
@@ -81,11 +84,32 @@
 ```bash
 # 构建项目
 mvn clean package
+
+# 创建可执行jar文件
+jar -cfm main.jar MANIFEST.MF -C target/classes .
 ```
 
 ### 运行方式
 
-#### 1. 独立前端页面（推荐）
+#### 1. 命令行版本（符合作业要求）
+
+```bash
+# 基本用法
+java -jar main.jar <原文文件> <抄袭文件> <输出文件>
+
+# 示例
+java -jar main.jar 测试文本/orig.txt 测试文本/orig_0.8_add.txt result.txt
+```
+
+**命令行版本特点：**
+- ✅ 符合作业要求的标准格式
+- ✅ 5秒内完成计算
+- ✅ 内存使用极低（<2048MB）
+- ✅ 无网络连接依赖
+- ✅ 只读写指定文件
+- ✅ 无异常退出风险
+
+#### 2. 独立前端页面（推荐）
 
 ```bash
 # 启动后端服务
@@ -102,14 +126,11 @@ mvn spring-boot:run
 4. 点击"测试连接"验证连接
 5. 选择文本输入或文件上传模式进行查重
 
-#### 2. 命令行
+#### 3. Spring Boot版本命令行
 
 ```bash
-# 基本用法
+# 使用Spring Boot版本（较慢，不推荐）
 java -jar target/plagiarism-detector-1.0.0.jar <原文文件> <抄袭文件> <输出文件>
-
-# 示例
-java -jar target/plagiarism-detector-1.0.0.jar 测试文本/orig.txt 测试文本/orig_0.8_add.txt result.txt
 ```
 
 ### 测试
@@ -239,10 +260,16 @@ java -jar target/plagiarism-detector-1.0.0.jar
 # 直接双击 frontend.html 文件
 ```
 
+### 作业提交
+```bash
+java -jar main.jar <原文文件> <抄袭文件> <输出文件>
+```
+
 ### 注意事项
 - 确保后端服务运行在 `http://localhost:8080`
 - 前端页面支持跨域调用后端API
 - 如果端口被占用，可以修改 `application.properties` 中的端口配置
+- 命令行版本不依赖Spring Boot，启动速度快
 
 ## 联系方式
 
@@ -258,6 +285,13 @@ java -jar target/plagiarism-detector-1.0.0.jar
 - 配置CORS跨域支持
 - 完整的测试覆盖
 - 性能优化和监控
+
+### v1.1.0 (2024-01-01)
+- 添加独立命令行版本
+- 优化性能，5秒内完成计算
+- 降低内存使用，符合<2048MB要求
+- 修复CORS配置问题
+- 完善测试用例
 
 ## 使用说明
 

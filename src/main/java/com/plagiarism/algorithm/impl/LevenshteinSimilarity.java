@@ -15,7 +15,7 @@ public class LevenshteinSimilarity implements SimilarityAlgorithm {
     @Override
     public double calculateSimilarity(String text1, String text2) {
         if (StringUtils.isBlank(text1) && StringUtils.isBlank(text2)) {
-            return 1.0;
+            return 0.0;  // 两个空文本的相似度应该为0.0
         }
         
         if (StringUtils.isBlank(text1) || StringUtils.isBlank(text2)) {
