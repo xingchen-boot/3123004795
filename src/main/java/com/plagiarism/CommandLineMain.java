@@ -1,8 +1,6 @@
 package com.plagiarism;
 
 import com.plagiarism.algorithm.impl.CosineSimilarity;
-import com.plagiarism.algorithm.impl.JaccardSimilarity;
-import com.plagiarism.algorithm.impl.LevenshteinSimilarity;
 import com.plagiarism.algorithm.SimilarityAlgorithm;
 
 import java.io.*;
@@ -84,8 +82,9 @@ public class CommandLineMain {
                 parentDir.mkdirs();
             }
             
-            // 写入结果
-            try (FileWriter writer = new FileWriter(outputFile, StandardCharsets.UTF_8)) {
+            // 写入结果 - 使用Java 8兼容的方式
+            try (OutputStreamWriter writer = new OutputStreamWriter(
+                    new FileOutputStream(outputFile), StandardCharsets.UTF_8)) {
                 writer.write(String.format("%.2f", similarity));
             }
         } catch (IOException e) {

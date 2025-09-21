@@ -81,13 +81,19 @@ public class CosineSimilarity implements SimilarityAlgorithm {
             return words;
         }
         
+        // 预处理文本，去除标点符号
+        String cleanText = preprocessText(text);
+        
         // 按空格分割
-        String[] tokens = text.split("\\s+");
+        String[] tokens = cleanText.split("\\s+");
         
         for (String token : tokens) {
             if (StringUtils.isNotBlank(token)) {
-                // 对于中文，按字符分割
+                // 对于中文，按字符分割，但也保留完整的词
                 if (CHINESE_PATTERN.matcher(token).find()) {
+                    // 添加完整的中文词
+                    words.add(token);
+                    // 也添加单个中文字符
                     for (char c : token.toCharArray()) {
                         if (CHINESE_PATTERN.matcher(String.valueOf(c)).matches()) {
                             words.add(String.valueOf(c));
@@ -102,6 +108,7 @@ public class CosineSimilarity implements SimilarityAlgorithm {
         
         return words;
     }
+    
     
     /**
      * 计算词频向量

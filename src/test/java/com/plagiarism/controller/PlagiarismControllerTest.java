@@ -11,10 +11,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,7 +40,7 @@ class PlagiarismControllerTest {
     private ObjectMapper objectMapper;
     
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         // 设置默认的模拟行为
         when(plagiarismDetectionService.calculateSimilarity(anyString(), anyString()))
             .thenReturn(0.85);

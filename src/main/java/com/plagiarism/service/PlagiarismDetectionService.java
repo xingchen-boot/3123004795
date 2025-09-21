@@ -48,6 +48,7 @@ public class PlagiarismDetectionService {
         return calculateSimilarity(originalText, plagiarizedText);
     }
     
+    
     /**
      * 计算两个文本的相似度
      * 使用多种算法计算并取平均值

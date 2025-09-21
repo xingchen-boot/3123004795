@@ -30,7 +30,7 @@ class PlagiarismDetectionServiceTest {
     
     @Test
     @DisplayName("测试文本相似度计算")
-    void testCalculateSimilarity() {
+    void testCalculateSimilarity() throws IOException {
         String text1 = "这是一个测试文本";
         String text2 = "这是一个测试文本";
         
@@ -59,7 +59,7 @@ class PlagiarismDetectionServiceTest {
     @DisplayName("测试文件不存在异常")
     void testFileNotExists() {
         assertThrows(IOException.class, () -> {
-            service.calculateSimilarity("不存在的文件.txt", "另一个不存在的文件.txt");
+            service.calculateSimilarityFromFiles("不存在的文件.txt", "另一个不存在的文件.txt");
         }, "文件不存在应该抛出IOException");
     }
     
@@ -113,7 +113,7 @@ class PlagiarismDetectionServiceTest {
     
     @Test
     @DisplayName("测试空文本处理")
-    void testEmptyTextHandling() {
+    void testEmptyTextHandling() throws IOException {
         double similarity1 = service.calculateSimilarity("", "");
         assertEquals(0.0, similarity1, 0.001, "两个空文本的相似度应该为0.0");
         
@@ -123,7 +123,7 @@ class PlagiarismDetectionServiceTest {
     
     @Test
     @DisplayName("测试null文本处理")
-    void testNullTextHandling() {
+    void testNullTextHandling() throws IOException {
         double similarity1 = service.calculateSimilarity(null, null);
         assertEquals(0.0, similarity1, 0.001, "两个null文本的相似度应该为0.0");
         
@@ -133,7 +133,7 @@ class PlagiarismDetectionServiceTest {
     
     @Test
     @DisplayName("测试长文本性能")
-    void testLongTextPerformance() {
+    void testLongTextPerformance() throws IOException {
         StringBuilder sb1 = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
         

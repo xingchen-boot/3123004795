@@ -103,7 +103,7 @@ class PlagiarismIntegrationTest {
     
     @Test
     @DisplayName("测试边界情况")
-    void testBoundaryConditions() {
+    void testBoundaryConditions() throws IOException {
         // 测试空文本
         double similarity1 = plagiarismDetectionService.calculateSimilarity("", "");
         assertEquals(0.0, similarity1, 0.001, "两个空文本的相似度应该为0.0");
@@ -123,7 +123,7 @@ class PlagiarismIntegrationTest {
     
     @Test
     @DisplayName("测试中英文混合文本")
-    void testMixedLanguageText() {
+    void testMixedLanguageText() throws IOException {
         String text1 = "Hello 世界 123";
         String text2 = "Hello 世界 456";
         
@@ -134,7 +134,7 @@ class PlagiarismIntegrationTest {
     
     @Test
     @DisplayName("测试标点符号处理")
-    void testPunctuationHandling() {
+    void testPunctuationHandling() throws IOException {
         String text1 = "这是一个测试文本！";
         String text2 = "这是一个测试文本？";
         

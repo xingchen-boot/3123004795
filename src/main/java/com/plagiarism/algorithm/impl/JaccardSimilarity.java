@@ -22,7 +22,7 @@ public class JaccardSimilarity implements SimilarityAlgorithm {
     @Override
     public double calculateSimilarity(String text1, String text2) {
         if (StringUtils.isBlank(text1) && StringUtils.isBlank(text2)) {
-            return 1.0;
+            return 0.0;  // 两个空文本的相似度应该为0.0
         }
         
         if (StringUtils.isBlank(text1) || StringUtils.isBlank(text2)) {
@@ -53,13 +53,18 @@ public class JaccardSimilarity implements SimilarityAlgorithm {
             return "";
         }
         
-        // 去除标点符号，保留中文、英文、数字
+        // 去除标点符号，保留中文、英文、数字，并转换为小写
         StringBuilder sb = new StringBuilder();
         for (char c : text.toCharArray()) {
             if (CHINESE_PATTERN.matcher(String.valueOf(c)).matches() ||
                 ENGLISH_PATTERN.matcher(String.valueOf(c)).matches() ||
                 DIGIT_PATTERN.matcher(String.valueOf(c)).matches()) {
-                sb.append(c);
+                // 英文字母转换为小写
+                if (ENGLISH_PATTERN.matcher(String.valueOf(c)).matches()) {
+                    sb.append(Character.toLowerCase(c));
+                } else {
+                    sb.append(c);
+                }
             }
         }
         
