@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文查重系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .result-card.error {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .similarity-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #667eea;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .algorithm-selector {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-content {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-tabs .nav-link {
+            border-radius: 10px 10px 0 0;
+            border: none;
+            color: #6c757d;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <div class="header">
+                <h1><i class="fas fa-search"></i> 论文查重系统</h1>
+                <p>基于多种算法的智能文本相似度检测工具</p>
+            </div>
+            
+            <!-- 配置区域 -->
+            <div class="config-section">
+                <h5><i class="fas fa-cog"></i> 服务器配置</h5>
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="serverUrl" 
+                               value="http://localhost:8080" 
+                               placeholder="请输入后端服务器地址">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100" onclick="testConnection()">
+                            <i class="fas fa-plug"></i> 测试连接
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted">默认地址: http://localhost:8080</small>
+            </div>
+            
+            <!-- 导航标签 -->
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-panel" type="button" role="tab">
+                        <i class="fas fa-edit"></i> 文本输入
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-panel" type="button" role="tab">
+                        <i class="fas fa-file-upload"></i> 文件上传
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="mainTabContent">
+                <!-- 文本输入面板 -->
+                <div class="tab-pane fade show active" id="text-panel" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> 原文</h5>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control" id="originalText" rows="10" 
+                                              placeholder="请输入原文内容..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-copy"></i> 待检测文本</h5>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control" id="plagiarizedText" rows="10" 
+                                              placeholder="请输入待检测的文本内容..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-selector">
+                        <label for="algorithmSelect" class="form-label">
+                            <i class="fas fa-cogs"></i> 选择算法
+                        </label>
+                        <select class="form-select" id="algorithmSelect">
+                            <option value="">使用综合算法（推荐）</option>
+                        </select>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg" onclick="calculateSimilarity()">
+                            <i class="fas fa-calculator"></i> 开始检测
+                        </button>
+                        <button class="btn btn-secondary btn-lg ms-2" onclick="clearText()">
+                            <i class="fas fa-trash"></i> 清空内容
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 文件上传面板 -->
+                <div class="tab-pane fade" id="file-panel" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> 原文文件</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="file-upload-area" onclick="document.getElementById('originalFile').click()">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                        <p class="mb-2">点击选择原文文件</p>
+                                        <p class="text-muted small">支持 .txt, .doc, .docx 格式</p>
+                                        <input type="file" id="originalFile" class="d-none" accept=".txt,.doc,.docx">
+                                    </div>
+                                    <div id="originalFileInfo" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-copy"></i> 待检测文件</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="file-upload-area" onclick="document.getElementById('plagiarizedFile').click()">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                        <p class="mb-2">点击选择待检测文件</p>
+                                        <p class="text-muted small">支持 .txt, .doc, .docx 格式</p>
+                                        <input type="file" id="plagiarizedFile" class="d-none" accept=".txt,.doc,.docx">
+                                    </div>
+                                    <div id="plagiarizedFileInfo" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary btn-lg" onclick="calculateSimilarityFromFiles()">
+                            <i class="fas fa-calculator"></i> 开始检测
+                        </button>
+                        <button class="btn btn-secondary btn-lg ms-2" onclick="clearFiles()">
+                            <i class="fas fa-trash"></i> 清空文件
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 加载状态 -->
+            <div class="loading" id="loading">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">检测中...</span>
+                </div>
+                <p class="mt-3">正在计算相似度，请稍候...</p>
+            </div>
+            
+            <!-- 结果显示 -->
+            <div class="result-card" id="resultCard">
+                <h3><i class="fas fa-chart-line"></i> 检测结果</h3>
+                <div class="similarity-value" id="similarityValue">0.00</div>
+                <p class="mb-0">文本相似度</p>
+                <div class="mt-3">
+                    <button class="btn btn-light" onclick="downloadResult()">
+                        <i class="fas fa-download"></i> 下载结果
+                    </button>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>&copy; 2024 论文查重系统. 基于多种相似度算法的智能检测工具.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentResult = null;
+        let serverUrl = 'http://localhost:8080';
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAvailableAlgorithms();
+            setupFileUpload();
+        });
+        
+        // 获取服务器地址
+        function getServerUrl() {
+            return document.getElementById('serverUrl').value.trim() || 'http://localhost:8080';
+        }
+        
+        // 测试连接
+        async function testConnection() {
+            const url = getServerUrl();
+            try {
+                const response = await fetch(`${url}/api/health`);
+                const data = await response.json();
+                
+                if (data.status === 'UP') {
+                    alert('连接成功！服务器运行正常。');
+                } else {
+                    alert('服务器响应异常。');
+                }
+            } catch (error) {
+                alert('连接失败：' + error.message + '\n请检查服务器地址是否正确。');
+            }
+        }
+        
+        // 加载可用算法
+        async function loadAvailableAlgorithms() {
+            try {
+                const url = getServerUrl();
+                const response = await fetch(`${url}/api/algorithms`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const select = document.getElementById('algorithmSelect');
+                    // 清空现有选项（保留第一个默认选项）
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    data.algorithms.forEach(algorithm => {
+                        const option = document.createElement('option');
+                        option.value = algorithm;
+                        option.textContent = algorithm;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('加载算法列表失败:', error);
+                // 如果后端不可用，使用本地算法列表
+                const select = document.getElementById('algorithmSelect');
+                const localAlgorithms = [
+                    'Cosine Similarity',
+                    'Levenshtein Distance', 
+                    'Jaccard Similarity'
+                ];
+                localAlgorithms.forEach(algorithm => {
+                    const option = document.createElement('option');
+                    option.value = algorithm;
+                    option.textContent = algorithm;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        // 设置文件上传
+        function setupFileUpload() {
+            const originalFile = document.getElementById('originalFile');
+            const plagiarizedFile = document.getElementById('plagiarizedFile');
+            
+            originalFile.addEventListener('change', function(e) {
+                displayFileInfo(e.target, 'originalFileInfo');
+            });
+            
+            plagiarizedFile.addEventListener('change', function(e) {
+                displayFileInfo(e.target, 'plagiarizedFileInfo');
+            });
+        }
+        
+        // 显示文件信息
+        function displayFileInfo(input, infoId) {
+            const infoDiv = document.getElementById(infoId);
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                infoDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-file"></i> 
+                        <strong>${file.name}</strong> 
+                        (${formatFileSize(file.size)})
+                    </div>
+                `;
+            } else {
+                infoDiv.innerHTML = '';
+            }
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 计算文本相似度
+        async function calculateSimilarity() {
+            const originalText = document.getElementById('originalText').value.trim();
+            const plagiarizedText = document.getElementById('plagiarizedText').value.trim();
+            const algorithm = document.getElementById('algorithmSelect').value;
+            
+            if (!originalText || !plagiarizedText) {
+                showError('请输入原文和待检测文本');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const url = getServerUrl();
+                let apiUrl = `${url}/api/similarity`;
+                let body = {
+                    originalText: originalText,
+                    plagiarizedText: plagiarizedText
+                };
+                
+                if (algorithm) {
+                    apiUrl = `${url}/api/similarity/algorithm`;
+                    body.algorithmName = algorithm;
+                }
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(data.similarity, data.similarityPercentage, data.algorithm);
+                } else {
+                    showError(data.error || '计算失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // 从文件计算相似度
+        async function calculateSimilarityFromFiles() {
+            const originalFile = document.getElementById('originalFile').files[0];
+            const plagiarizedFile = document.getElementById('plagiarizedFile').files[0];
+            
+            if (!originalFile || !plagiarizedFile) {
+                showError('请选择原文文件和待检测文件');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const url = getServerUrl();
+                const formData = new FormData();
+                formData.append('originalFile', originalFile);
+                formData.append('plagiarizedFile', plagiarizedFile);
+                
+                const response = await fetch(`${url}/api/similarity/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(data.similarity, data.similarityPercentage);
+                } else {
+                    showError(data.error || '计算失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // 显示结果
+        function showResult(similarity, percentage, algorithm = null) {
+            currentResult = { similarity, percentage, algorithm };
+            
+            const resultCard = document.getElementById('resultCard');
+            const similarityValue = document.getElementById('similarityValue');
+            
+            similarityValue.textContent = similarity;
+            resultCard.style.display = 'block';
+            resultCard.classList.remove('error');
+            
+            // 根据相似度设置颜色
+            const similarityNum = parseFloat(similarity);
+            if (similarityNum >= 0.8) {
+                resultCard.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+            } else if (similarityNum >= 0.6) {
+                resultCard.style.background = 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)';
+            } else if (similarityNum >= 0.4) {
+                resultCard.style.background = 'linear-gradient(135deg, #f1c40f 0%, #f39c12 100%)';
+            } else {
+                resultCard.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+            }
+            
+            // 滚动到结果
+            resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 显示错误
+        function showError(message) {
+            const resultCard = document.getElementById('resultCard');
+            const similarityValue = document.getElementById('similarityValue');
+            
+            similarityValue.textContent = '错误';
+            resultCard.style.display = 'block';
+            resultCard.classList.add('error');
+            resultCard.innerHTML = `
+                <h3><i class="fas fa-exclamation-triangle"></i> 检测失败</h3>
+                <p class="mb-0">${message}</p>
+            `;
+            
+            resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+        
+        // 隐藏加载状态
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // 清空文本
+        function clearText() {
+            document.getElementById('originalText').value = '';
+            document.getElementById('plagiarizedText').value = '';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+        
+        // 清空文件
+        function clearFiles() {
+            document.getElementById('originalFile').value = '';
+            document.getElementById('plagiarizedFile').value = '';
+            document.getElementById('originalFileInfo').innerHTML = '';
+            document.getElementById('plagiarizedFileInfo').innerHTML = '';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+        
+        // 下载结果
+        function downloadResult() {
+            if (!currentResult) return;
+            
+            const content = `论文查重检测结果\n\n相似度: ${currentResult.similarity}\n百分比: ${currentResult.percentage}\n检测时间: ${new Date().toLocaleString()}`;
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `查重结果_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
